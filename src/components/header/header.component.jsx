@@ -7,6 +7,7 @@ import { ReactComponent as Logo } from '../../assets/crown.svg'
 
 import { auth } from '../../firebase/firebase.utils'
 
+import { connect } from 'react-redux';
 
 const Header = ({ currentUser }) => (
 
@@ -39,7 +40,12 @@ const Header = ({ currentUser }) => (
 
 
   </div>
-)
+);
 
+// state is rootReducer
+const mapStatetoProps = state => ({
+  currentUser: state.user.currentUser
+})
 
-export default Header;
+// connect is a HOC that allows a component to have access to redux
+export default connect(mapStatetoProps)(Header);
