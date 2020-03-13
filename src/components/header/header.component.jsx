@@ -11,6 +11,10 @@ import { connect } from 'react-redux';
 import CartIcon from '../cart-icon/cart-icon.component';
 import CartDropdown from '../cart-dropdown/cart-dropdown.component';
 
+import { selectCartHidden } from '../../redux/cart/cart.selectors';
+import { selectCurrentUser } from '../../redux/user/user.selectors';
+import { createStructuredSelector } from 'reselect'
+
 const Header = ({ currentUser, hidden }) => (
 
   <div className='header'>
@@ -47,11 +51,11 @@ const Header = ({ currentUser, hidden }) => (
   </div>
 );
 
-// state is rootReducer
-const mapStatetoProps = ({ user: { currentUser }, cart: { hidden } }) => ({
-  currentUser,
-  hidden
-})
+// createStructuredSelector automatically passes top level state into all selectors
+const mapStatetoProps = createStructuredSelector ({
+  currentUser: selectCurrentUser,
+  hidden: selectCartHidden
+});
 
 // connect is a HOC that allows a component to have access to redux
 export default connect(mapStatetoProps)(Header);
