@@ -13,7 +13,9 @@ import { selectCurrentUser } from '../../redux/user/user.selectors';
 import { createStructuredSelector } from 'reselect'
 import { HeaderContainer, LogoContainer, OptionsContainer, OptionLink } from './header.styles';
 
-const Header = ({ currentUser, hidden }) => (
+import { signOutStart } from "../../redux/user/user.actions";
+
+const Header = ({ currentUser, hidden, signOutStart }) => (
 
   <HeaderContainer>
 
@@ -31,7 +33,7 @@ const Header = ({ currentUser, hidden }) => (
 
       { 
         currentUser ?
-          <OptionLink as='div' onClick={() => auth.signOut()}>
+          <OptionLink as='div' onClick={signOutStart}>
             SIGN OUT
           </OptionLink>
         : 
@@ -55,5 +57,9 @@ const mapStatetoProps = createStructuredSelector ({
   hidden: selectCartHidden
 });
 
+const mapDispatchToProps = dispatch => ({
+  signOutStart: () => dispatch(signOutStart())
+})
+
 // connect is a HOC that allows a component to have access to redux
-export default connect(mapStatetoProps)(Header);
+export default connect(mapStatetoProps, mapDispatchToProps)(Header);

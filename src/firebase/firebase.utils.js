@@ -16,12 +16,8 @@ const config = {
 export const createUserProfileDocument = async (userAuth, additionalData) => {
 
   if (!userAuth) return;
-  // console.log(userAuth);
   const userRef = firestore.doc(`users/${userAuth.uid}`);
-
   const snapShot = await userRef.get();
-
-  // console.log(snapShot);
 
   if(!snapShot.exists) {
     const { displayName, email } = userAuth;
@@ -45,17 +41,15 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
 
 firebase.initializeApp(config);
 
-// Call to programmatically add collections to firebase database once
-// Add to app.js componentDidMount
+// Function to programmatically add collections to firebase database once
+// Added to app.js componentDidMount, then removed
 export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => {
   const collectionRef = firestore.collection(collectionKey);
   const batch = firestore.batch();
-
   objectsToAdd.forEach(obj => {
     const newDocRef = collectionRef.doc();
     batch.set(newDocRef, obj)
   });
-
   return await batch.commit();
 };
 
@@ -75,17 +69,23 @@ export const convertCollectionsSnapshotToMap = collections => {
     accumulator[collection.title.toLowerCase()] = collection;
     return accumulator;
   }, {});
-  
+}
+
+export const getCurrentUser = () => {
+  return new Promise((resolve, reject) => {
+    const unsubcribe = auth.onAuthStateChanged(userAuth => {
+      unsubcribe();
+      resolve(userAuth);
+    }, reject)
+  })
 }
 
 
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
 
-const provider = new firebase.auth.GoogleAuthProvider();
-provider.setCustomParameters({ prompt: 'select_account' });
-
-export const signInWithGoogle = () => auth.signInWithPopup(provider);
+export const googleProvider = new firebase.auth.GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
 
 
 export default firebase;
