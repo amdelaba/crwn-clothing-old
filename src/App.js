@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect} from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 
@@ -16,65 +16,48 @@ import CheckoutPage from './pages/checkout/checkout.component';
 
 import { selectCollectionsForPreview } from './redux/shop/shop.selectors'
 
-class App extends React.Component {
+const App = ({ checkUserSession, currentUser }) => {
 
-  componentDidMount() {
-    
-    const { checkUserSession } = this.props;
+  // //Code used to add shop collections to firebase DB
+  // //originally inside componentDidMount()
+  // const {collectionsArray} = this.props;
+  // addCollectionAndDocuments('collections', 
+  //   collectionsArray.map(({ title, items }) => ({ title, items })));
+  
+  // Replaces componentDidMount
+  // Add checkUserSession to dependency array to guaranteed 
+  // only runs once on mount (can only do since checkUserSession was passed as props)
+  useEffect(() => {
     checkUserSession();
-    
-    // // Uncomment to re-add shop collections to firebase DB
-    // const {collectionsArray} = this.props;
-    // addCollectionAndDocuments('collections', 
-    //   collectionsArray.map(({ title, items }) => ({ title, items })));
+  }, [checkUserSession]);
+  
+  return (
+    <div>
+      <Header />
+      <Switch>  
+        <Route exact path='/' component={HomePage} />
+        <Route path='/shop' component={ShopPage} /> 
+        <Route exact path='/checkout' component={CheckoutPage} /> 
 
-    // const {setCurrentUser} = this.props;
-    // // onAuthStateChanged returns unsubscribe function
-    // this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
-    //   if(userAuth) {
-    //     const userRef = await createUserProfileDocument(userAuth);
-    //     userRef.onSnapshot(snapshot => {
-    //       setCurrentUser({
-    //         currentUser: {
-    //           id: snapshot.id,
-    //           ...snapshot.data()
-    //         }
-    //       });
-    //     });
-    //   }
-    //   setCurrentUser(userAuth);
-    // });
-  }
+        <Route 
+          exact 
+          path='/signin' 
+          render={() =>
+              currentUser ? 
+              (<Redirect to='/'/>) : 
+              (<SignInAndSignUpPage/>
+          )}
+          /> 
 
-  render(){ 
-    return (
-      <div>
-        <Header />
-        <Switch>  
-          <Route exact path='/' component={HomePage} />
-          <Route path='/shop' component={ShopPage} /> 
-          <Route exact path='/checkout' component={CheckoutPage} /> 
-
-          <Route 
-            exact 
-            path='/signin' 
-            render={() =>
-               this.props.currentUser ? 
-               (<Redirect to='/'/>) : 
-               (<SignInAndSignUpPage/>
-            )}
-           /> 
-
-        </Switch>
-      </div>
-    );
-  }
+      </Switch>
+    </div>
+  );
 }
 
 //gives us access to this.props.currentUser from redux
 const mapStateToProps = createStructuredSelector ({
   currentUser: selectCurrentUser,
-  collectionsArray: selectCollectionsForPreview
+  collectionsArray: selectCollectionsForPreview // used to add shop data to db
 })
 
 //gives us access to this.props.setCurrentUser function  from redux
